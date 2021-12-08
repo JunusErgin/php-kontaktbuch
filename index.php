@@ -122,11 +122,28 @@
             border-radius: 4px;
             position: absolute;
             top: 0px;
+            width: 60px;
+            right: 0px;
+        }        
+        
+        .deletebtn {
+            background-color: red;
+            padding: 4px;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            position: absolute;
+            bottom: 0px;
+            width: 60px;
             right: 0px;
         }
 
         .phonebtn:hover {
             background-color: #26d026;
+        }
+
+        .deletebtn:hover {
+            background-color: #FF3333;
         }
     </style>
 </head>
@@ -174,6 +191,10 @@
                 file_put_contents('contacts.txt', json_encode($contacts, JSON_PRETTY_PRINT));
             }
 
+            if ($_GET['page'] == 'delete') {
+                $headline = 'Kontakt gelöscht';
+            }
+
             if ($_GET['page'] == 'contacts') {
                 $headline = 'Deine Kontakte';
             }
@@ -188,12 +209,22 @@
 
             echo '<h1>' . $headline . '</h1>';
 
-            if ($_GET['page'] == 'contacts') {
+            if ($_GET['page'] == 'delete') {
+                echo '<p>Dein Kontakt wurde gelöscht</p>';
+                # Wir laden die Nummer der Reihe aus den URL Parametern
+                $index = $_GET['delete']; 
+
+                # Wir löschen die Stelle aus dem Array 
+                unset($contacts[$index]); 
+
+                # Tabelle erneut speichern in Datei contacts.txt
+                file_put_contents('contacts.txt', json_encode($contacts, JSON_PRETTY_PRINT));
+            } else if ($_GET['page'] == 'contacts') {
                 echo "
                     <p>Auf dieser Seite hast du einen Überblick über deine <b>Kontakte</b></p>
                 ";
 
-                foreach ($contacts as $row) {
+                foreach ($contacts as $index=>$row) {
                     $name = $row['name'];
                     $phone = $row['phone'];
 
@@ -204,6 +235,7 @@
                         $phone
 
                         <a class='phonebtn' href='tel:$phone'>Anrufen</a>
+                        <a class='deletebtn' href='?page=delete&delete=$index'>Löschen</a>
                     </div>
                     ";
                 }
